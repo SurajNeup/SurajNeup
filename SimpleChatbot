@@ -1,0 +1,39 @@
+import java.util.Scanner;
+
+public class SimpleChatbot {
+
+    // Method to handle user input and generate responses
+    private static String getResponse(String input) {
+        input = input.toLowerCase().trim();
+        switch (input) {
+            case "hello":
+                return "Hi there! How can I help you today?";
+            case "how are you":
+                return "I'm just a program, but I'm doing well. How about you?";
+            case "what is your name":
+                return "I am a simple chatbot created in Java.";
+            case "bye":
+                return "Goodbye! Have a great day!";
+            default:
+                return "Sorry, I don't understand that.";
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to the Simple Chatbot!");
+        System.out.println("Type 'bye' to exit.");
+
+        while (true) {
+            System.out.print("You: ");
+            String userInput = scanner.nextLine();
+            if (userInput.equalsIgnoreCase("bye")) {
+                System.out.println("Chatbot: " + getResponse(userInput));
+                break;
+            }
+            String response = getResponse(userInput);
+            System.out.println("Chatbot: " + response);
+        }
+        scanner.close();
+    }
+}
