@@ -1,0 +1,175 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+// Stock class representing individual stocks
+class Stock {
+    private String symbol;
+    private double price;
+
+    public Stock(String symbol, double price) {
+        this.symbol = symbol;
+        this.price = price;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return symbol + ": $" + price;
+    }
+}
+
+// Portfolio class to manage stocks
+class Portfolio {
+    private Map<String, Integer> stocks; // Map of stock symbol to quantity
+
+    public Portfolio() {
+        stocks = new HashMap<>();
+    }
+
+    public void buyStock(String symbol, int quantity) {
+        stocks.put(symbol, stocks.getOrDefault(symbol, 0) + quantity);
+    }
+
+    public void sellStock(String symbol, int quantity) {
+        if (stocks.containsKey(symbol)) {
+            int currentQuantity = stocks.get(symbol);
+            if (currentQuantity >= quantity) {
+                stocks.put(symbol, currentQuantity - quantity);
+                if (stocks.get(symbol) == 0) {
+                    stocks.remove(symbol);
+                }
+            } else {
+                System.out.println("Not enough shares to sell.");
+            }
+        } else {
+            System.out.println("Stock not found in portfolio.");
+        }
+    }
+
+    public double getPortfolioValue(Map<String, Stock> marketData) {
+        double totalValue = 0;
+        for (Map.Entry<String, Integer> entry : stocks.entrySet()) {
+            String symbol = entry.getKey();
+            int quantity = entry.getValue();
+            Stock stock = marketData.get(symbol);
+            if (stock != null) {
+                totalValue += stock.getPrice() * quantity;
+            }
+        }
+        return totalValue;
+    }
+
+    @Override
+    public String toString() {
+        return stocks.toString();
+    }
+}
+
+// StockMarket class to simulate the stock market
+class StockMarket {
+    private Map<String, Stock> marketData;
+
+    public StockMarket() {
+        marketData = new HashMap<>();
+        // Initializing with some stocks
+        marketData.put("AAPL", new Stock("AAPL", 150.0));
+        marketData.put("GOOGL", new Stock("GOOGL", 2800.0));
+        marketData.put("AMZN", new Stock("AMZN", 3400.0));
+    }
+
+    public void updateStockPrice(String symbol, double newPrice) {
+        Stock stock = marketData.get(symbol);
+        if (stock != null) {
+            stock.setPrice(newPrice);
+        } else {
+            System.out.println("Stock not found.");
+        }
+    }
+
+    public Map<String, Stock> getMarketData() {
+        return marketData;
+    }
+
+    @Override
+    public String toString() {
+        return marketData.toString();
+    }
+}
+
+// TradingPlatform class to interact with the user
+public class TradingPlatform {
+    private StockMarket stockMarket;
+    private Portfolio portfolio;
+
+    public TradingPlatform() {
+        stockMarket = new StockMarket();
+        portfolio = new Portfolio();
+    }
+
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("1. Show Market Data");
+            System.out.println("2. Buy Stock");
+            System.out.println("3. Sell Stock");
+            System.out.println("4. Show Portfolio");
+            System.out.println("5. Show Portfolio Value");
+            System.out.println("6. Exit");
+            System.out.print("Choose an option: ");
+            
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.println(stockMarket);
+                    break;
+                case 2:
+                    System.out.print("Enter stock symbol: ");
+                    String buySymbol = scanner.nextLine();
+                    System.out.print("Enter quantity: ");
+                    int buyQuantity = scanner.nextInt();
+                    portfolio.buyStock(buySymbol, buyQuantity);
+                    break;
+                case 3:
+                    System.out.print("Enter stock symbol: ");
+                    String sellSymbol = scanner.nextLine();
+                    System.out.print("Enter quantity: ");
+                    int sellQuantity = scanner.nextInt();
+                    portfolio.sellStock(sellSymbol, sellQuantity);
+                    break;
+                case 4:
+                    System.out.println("Portfolio: " + portfolio);
+                    break;
+                case 5:
+                    double portfolioValue = portfolio.getPortfolioValue(stockMarket.getMarketData());
+                    System.out.println("Portfolio Value: $" + portfolioValue);
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+                    break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        TradingPlatform platform = new TradingPlatform();
+        platform.run();
+    }
+}
